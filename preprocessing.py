@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.src.legacy.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 
 data_dir = "data/raw"
@@ -51,7 +51,7 @@ plt.suptitle("Augmented Images")
 plt.show()
 
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.src.legacy.preprocessing.image import ImageDataGenerator
 import os
 
 data_dir = "data/raw"  
@@ -80,7 +80,7 @@ for class_name in os.listdir(data_dir):
         classes=[class_name],
         target_size=IMG_SIZE,
         batch_size=1,
-        class_mode=None,
+        class_mode=None, # type: ignore
         save_to_dir=save_class_path,
         save_prefix='aug',
         save_format='jpg'
