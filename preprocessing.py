@@ -1,95 +1,57 @@
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.src.legacy.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
+import os
 
-data_dir = "data/raw"
-
+# --- 1. SETTINGS ---
+DATA_DIR = "data/raw"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
 
+# --- 2. THE AUGMENTATION ENGINE (The "RAM" Part) ---
+# This creates infinite variations in memory while the script runs
 train_datagen = ImageDataGenerator(
     rescale=1./255,
-    rotation_range=25,
-    width_shift_range=0.1,
-    height_shift_range=0.1,
-    zoom_range=0.2,
-    shear_range=0.1,
-    horizontal_flip=True,
-    fill_mode='nearest',
-    validation_split=0.2
+    rotation_range=30,      # Tilted images
+    width_shift_range=0.2,  # Moved sideways
+    height_shift_range=0.2, # Moved up/down
+    zoom_range=0.2,         # Zoomed in/out
+    horizontal_flip=True,   # Mirrored
+    fill_mode='nearest',    # Fills in gaps from rotation
+    validation_split=0.2    # Reserves 20% for testing
 )
 
+# --- 3. DATA LOADERS ---
+# This pulls from 'data/raw' but applies the "twists" on the fly
 train_generator = train_datagen.flow_from_directory(
-    data_dir,
+    DATA_DIR,
     target_size=IMG_SIZE,
     batch_size=BATCH_SIZE,
     class_mode='categorical',
-    subset='training'
+    subset='training',
+    shuffle=True
 )
+# Fix: separate val datagen
+val_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 
-val_generator = train_datagen.flow_from_directory(
-    data_dir,
-    target_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    class_mode='categorical',
-    subset='validation'
+val_generator = val_datagen.flow_from_directory(  # use val_datagen, not train_datagen
+    DATA_DIR, target_size=IMG_SIZE, batch_size=BATCH_SIZE,
+    class_mode='categorical', subset='validation', shuffle=False
 )
+# --- 4. VERIFICATION ---
+print(f"\nSuccessfully loaded {train_generator.samples} training images.")
+print(f"Successfully loaded {val_generator.samples} validation images.")
 
-print("Classes:", train_generator.class_indices)
-print("Train samples:", train_generator.samples)
-print("Validation samples:", val_generator.samples)
-
+# Let's grab one batch to see the RAM magic
 images, labels = next(train_generator)
 
-plt.figure(figsize=(10, 6))
+# This shows the first 9 images from that memory-batch
+plt.figure(figsize=(10, 10))
 for i in range(9):
     plt.subplot(3, 3, i+1)
     plt.imshow(images[i])
+    plt.title(list(train_generator.class_indices.keys())[labels[i].argmax()])
     plt.axis('off')
 
-plt.suptitle("Augmented Images")
+plt.suptitle("Augmented Images (Generated in RAM)")
 plt.show()
-
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import os
-
-data_dir = "data/raw"  
-save_dir = "data/augmented" 
-
-os.makedirs(save_dir, exist_ok=True)
-
-IMG_SIZE = (224, 224)
-
-datagen = ImageDataGenerator(
-    rescale=1./255,
-    rotation_range=30,
-    zoom_range=0.2,
-    horizontal_flip=True
-)
-
-for class_name in os.listdir(data_dir):
-
-    class_path = os.path.join(data_dir, class_name)
-    save_class_path = os.path.join(save_dir, class_name)
-
-    os.makedirs(save_class_path, exist_ok=True)
-
-    generator = datagen.flow_from_directory(
-        data_dir,
-        classes=[class_name],
-        target_size=IMG_SIZE,
-        batch_size=1,
-        class_mode=None,
-        save_to_dir=save_class_path,
-        save_prefix='aug',
-        save_format='jpg'
-    )
-
-    print(f"Processing {class_name}...")
-
-    i = 0
-    for batch in generator:
-        i += 1
-        if i > 150: 
-            break
