@@ -2,16 +2,23 @@ import tensorflow as tf
 from keras.src.legacy.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import os
+from pathlib import Path
 
 # --- 1. SETTINGS ---
-DATA_DIR = "data/raw"
+PROJECT_ROOT = Path(__file__).resolve().parent
+DATA_DIR = PROJECT_ROOT / "data" / "raw"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
+
+if not DATA_DIR.exists():
+    raise FileNotFoundError(
+        f"Dataset folder not found: {DATA_DIR}. "
+        "Expected structure: data/raw/<class_name>/*.jpg"
+    )
 
 # --- 2. THE AUGMENTATION ENGINE (The "RAM" Part) ---
 # This creates infinite variations in memory while the script runs
 train_datagen = ImageDataGenerator(
-    rescale=1./255,
     rotation_range=30,      # Tilted images
     width_shift_range=0.2,  # Moved sideways
     height_shift_range=0.2, # Moved up/down
@@ -24,7 +31,7 @@ train_datagen = ImageDataGenerator(
 # --- 3. DATA LOADERS ---
 # This pulls from 'data/raw' but applies the "twists" on the fly
 train_generator = train_datagen.flow_from_directory(
-    DATA_DIR,
+    str(DATA_DIR),
     target_size=IMG_SIZE,
     batch_size=BATCH_SIZE,
     class_mode='categorical',
@@ -35,7 +42,7 @@ train_generator = train_datagen.flow_from_directory(
 val_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 
 val_generator = val_datagen.flow_from_directory(  # use val_datagen, not train_datagen
-    DATA_DIR, target_size=IMG_SIZE, batch_size=BATCH_SIZE,
+    str(DATA_DIR), target_size=IMG_SIZE, batch_size=BATCH_SIZE,
     class_mode='categorical', subset='validation', shuffle=False
 )
 # --- 4. VERIFICATION ---
