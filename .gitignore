@@ -208,3 +208,5 @@ __marimo__/
 
 .keras
 best_phase1.keras
+best_multimodal.keras
+best_model.keras
