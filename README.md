@@ -28,7 +28,7 @@ Image → [Menna: EfficientNetB0] → features → [Malak: LSTM Decoder] → Eng
 | Dataset | Used by | Download |
 |---------|---------|----------|
 | Flickr8k (images + captions) | Menna, Malak | [Kaggle](https://www.kaggle.com/datasets/adityajn105/flickr8k) |
-| Opus100 (en-ar parallel corpus) | Pola | [Hugging Face](https://huggingface.co/datasets/opus100) |
+| Opus100 (en-ar parallel corpus) | Pola | [Hugging Face](https://huggingface.co/datasets/Helsinki-NLP/opus-100/viewer/ar-en) |
 | SQuAD | Alber | [Rajpurkar et al.](https://rajpurkar.github.io/SQuAD-explorer/) |
 
 Place Flickr8k images at: `data/Images/` (not inside any subfolder).
