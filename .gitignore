@@ -210,3 +210,8 @@ __marimo__/
 best_phase1.keras
 best_multimodal.keras
 best_model.keras
+data/Images/*
+outputs/encoder/all_features.npy
+outputs/encoder/features/
+outputs/encoder/efficientnetb0_encoder.keras
+outputs/encoder/sample_verification.png
